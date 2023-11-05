@@ -1,0 +1,195 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>  
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+
+        <!-- JsBarcode library -->
+        <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+        <title>Barcode Generator</title>
+        <style>
+            /* Your existing styles */
+            .logo {
+                display: inline-block;
+                margin-top: 10px;
+                margin-left: 10px;
+                cursor: pointer;
+            }
+
+            .logo img {
+                height: 50px;
+                width: 100px;
+            }
+            html, body {
+            height: 100%;
+            margin: 0; /* Reset default margin */
+            padding: 0; /* Reset default padding */
+        }
+        body {
+            /* background: linear-gradient(to right, #d0cfe4, #00c2e8);  */
+            background: #00c2e8;
+        }
+        .container {
+            position: relative;
+            z-index: 1;
+        }
+        .row.border {
+            background-color: rgba(255, 255, 255, 0.8); /* Adjust the opacity and color as desired */
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 50px;
+        }
+
+        /* body {
+            background-image: url("{% static 'delivery.png' %}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        } */
+
+        .footer {
+        /* background-color: #f8f9fa; */
+        padding: 20px 0;
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+    }
+
+    .footer a {
+        font-size: 24px;
+        color: #000;
+        margin: 0 10px;
+    }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-md-12">
+                    <!-- Your existing content here -->
+                    <div class="row ">
+                        <a href="#" onclick="return goToHomePage()">
+                            <div class="logo">
+                                <span>
+                                    <img src="{% static 'wolt.png' %}" alt="Logo" style="max-width: 100px;">
+                                </span>
+                                <span>
+                                    <h4 class="text-left" style="color: black;"> Barcode Generator</h4>
+                                </span>
+                            </div>
+                        </a>
+                    </div>
+                    <br><br>
+        
+                    <div class="row mt-5 justify-content-center">
+                        <div class="barcode-section">
+                            <div class="text-center">
+                                <label>Please Enter your id here: </label>
+                                <input type="text" class="form-control barcode-input text-center" id="input" placeholder="Enter your ID..." style="width: 300px;" oninput="validateInput(this)" />
+                                <br>
+                                <button type="button" class="btn btn-success btn-generate" onclick="generateBarcode()">Generate</button>
+                                <button type="button" class="btn btn-success btn-download" id="downloadBtn" style="display:none" onclick="downloadBarcode()">Download</button>
+                            </div>
+                            <div class="mt-4 text-center">
+                                <svg style="display:none; width: 300px; height: 150px;" id="barcode"></svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="col-4 col-md-4 text-right" >
+                    <img src="{% static 'delivery.png' %}" alt="Your Image" class="img-fluid" >
+                </div> -->
+            </div>
+        </div>
+        
+        
+        <footer class="footer">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <a href="https://www.instagram.com/your_instagram_handle" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.facebook.com/your_facebook_page" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook-square"></i></a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </body>
+</html>
+
+<script>
+function generateBarcode() {
+    var input = document.getElementById("input").value;
+    validateInput(document.getElementById("input")); // Add this line to validate the input
+
+    if (input.length < 5) {
+        alert("Please enter at least 5 digits.");
+        return false;
+    }
+
+    input = '1001' + input + '27599';
+
+    var barcode = document.getElementById("barcode");
+    var downloadButton = document.getElementById("downloadBtn");
+    if (input === '') {
+        alert("Please provide the data first.");
+        return false;
+    } else {
+        JsBarcode(barcode, input);
+        barcode.style.display = "inline";
+        downloadButton.style.display = "inline";
+    }
+}
+
+
+
+
+
+
+    function downloadBarcode(e, newWidth=1538, newHeight=625) {
+    const canvas = document.createElement("canvas");
+    const svg = document.getElementById("barcode");
+    const base64doc = btoa(unescape(encodeURIComponent(svg.outerHTML)));
+    const w = newWidth //|| parseInt(svg.getAttribute('width'));
+    const h = newHeight //|| parseInt(svg.getAttribute('height'));
+    const img_to_download = document.createElement('img');
+    img_to_download.src = 'data:image/svg+xml;base64,' + base64doc;
+    console.log(w, h);
+    img_to_download.onload = function () {
+        console.log('img loaded');
+        canvas.setAttribute('width', w);
+        canvas.setAttribute('height', h);
+        const context = canvas.getContext("2d");
+        context.drawImage(img_to_download, 0, 0, w, h);
+        const dataURL = canvas.toDataURL('image/png');
+        if (window.navigator.msSaveBlob) {
+            window.navigator.msSaveBlob(canvas.msToBlob(), "barcode.png");
+            e.preventDefault();
+        } else {
+            const a = document.createElement('a');
+            const my_evt = new MouseEvent('click');
+            a.download = 'download.png';
+            a.href = dataURL;
+            a.dispatchEvent(my_evt);
+        }
+    }
+}
+function validateInput(input) {
+    console.log(input)
+        const inputValue = input.value;
+        const isValidInput = /^\d{5,}$/.test(inputValue); // Check if the input is a digit and has at least 5 digits
+        if (!isValidInput) {
+            input.value = inputValue.replace(/[^\d]/g, ''); // Remove non-digit characters
+        }
+    }
+
+    function goToHomePage() {
+        window.location.href = window.location.href;
+    }
+</script>
