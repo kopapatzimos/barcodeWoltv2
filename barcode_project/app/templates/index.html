@@ -1,131 +1,43 @@
 {% load static %}
 
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>  
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<body>
 
+    {% block content %}
+    {% include "navbar.html" %}
+    <!-- Your custom content here -->
+    
+    <div class="container">
+        <div class="row justify-content-center barcode-section">
+            <div class="text-center">
+                <hr>
 
-        <!-- JsBarcode library -->
-        <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-        <title>Barcode Generator</title>
-        <style>
-            /* Your existing styles */
-            .logo {
-                display: inline-block;
-                margin-top: 10px;
-                margin-left: 10px;
-                cursor: pointer;
-            }
+                <label class="mb-4">Eισήγαγε τον αριθμό μητρώου (Courier ID) <br>( το βρίσκεις στην Ενότητα Οικονομικά->
+                    Υπόλοιπο μετρητών - δες φώτο)</label>
+                <input type="text" class="form-control barcode-input text-center mb-4" id="input" placeholder="Enter your ID..." oninput="validateInput(this)" />
 
-            .logo img {
-                height: 50px;
-                width: 100px;
-            }
-            html, body {
-            height: 100%;
-            margin: 0; /* Reset default margin */
-            padding: 0; /* Reset default padding */
-        }
-        body {
-            /* background: linear-gradient(to right, #d0cfe4, #00c2e8);  */
-            background: #00c2e8;
-        }
-        .container {
-            position: relative;
-            z-index: 1;
-        }
-        .row.border {
-            background-color: rgba(255, 255, 255, 0.8); /* Adjust the opacity and color as desired */
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 50px;
-        }
+                <button type="button" class="btn btn-success btn-generate" onclick="generateBarcode()">Generate Barcode</button>
 
-        /* body {
-            background-image: url("{% static 'delivery.png' %}");
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;
-        } */
+                <hr style="display: none;" id="hr-after-downloadBtn">
 
-        .footer {
-        /* background-color: #f8f9fa; */
-        padding: 20px 0;
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-    }
-
-    .footer a {
-        font-size: 24px;
-        color: #000;
-        margin: 0 10px;
-    }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="row">
-                <div class="col-12 col-md-12">
-                    <!-- Your existing content here -->
-                    <div class="row ">
-                        <a href="#" onclick="return goToHomePage()">
-                            <div class="logo">
-                                <span>
-                                    <img src="{% static 'wolt.png' %}" alt="Logo" style="max-width: 100px;">
-                                </span>
-                                <span>
-                                    <h4 class="text-left" style="color: black;"> Barcode Generator</h4>
-                                </span>
-                            </div>
-                        </a>
-                    </div>
-                    <br><br>
-        
-                    <div class="row mt-5 justify-content-center">
-                        <div class="barcode-section">
-                            <div class="text-center">
-                                <label>Please Enter your id here: </label>
-                                <input type="text" class="form-control barcode-input text-center" id="input" placeholder="Enter your ID..." style="width: 300px;" oninput="validateInput(this)" />
-                                <br>
-                                <button type="button" class="btn btn-success btn-generate" onclick="generateBarcode()">Generate</button>
-                                <button type="button" class="btn btn-success btn-download" id="downloadBtn" style="display:none" onclick="downloadBarcode()">Download</button>
-                            </div>
-                            <div class="mt-4 text-center">
-                                <svg style="display:none; width: 300px; height: 150px;" id="barcode"></svg>
-                            </div>
-                        </div>
-                    </div>
+                <div class="mt-4">
+                    <svg style="display:none; width: 300px; height: 150px;" id="barcode"></svg>
                 </div>
-                <!-- <div class="col-4 col-md-4 text-right" >
-                    <img src="{% static 'delivery.png' %}" alt="Your Image" class="img-fluid" >
-                </div> -->
+
+                <div class="mt-4">
+                    <button type="button" class="btn btn-success btn-download" id="downloadBtn" style="display:none;" onclick="downloadBarcode()">
+                        Download Barcode <i class="fas fa-download ml-2"></i>
+                    </button>
+                </div>
             </div>
         </div>
-        
-        
-        <footer class="footer">
-            <div class="container">
-                <div class="row">
-                    <div class="col-12 text-center">
-                        <a href="https://www.instagram.com/your_instagram_handle" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
-                        <a href="https://www.facebook.com/your_facebook_page" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook-square"></i></a>
-                    </div>
-                </div>
-            </div>
-        </footer>
-    </body>
-</html>
+    </div>
+    {% endblock %}
+
 
 <script>
 function generateBarcode() {
     var input = document.getElementById("input").value;
+    var hr = document.getElementById('hr-after-downloadBtn')
     validateInput(document.getElementById("input")); // Add this line to validate the input
 
     if (input.length < 5) {
@@ -144,6 +56,7 @@ function generateBarcode() {
         JsBarcode(barcode, input);
         barcode.style.display = "inline";
         downloadButton.style.display = "inline";
+        hr.style.display ='block'
     }
 }
 
@@ -190,6 +103,7 @@ function validateInput(input) {
     }
 
     function goToHomePage() {
-        window.location.href = window.location.href;
+        window.location.href = "/";
+        return false;
     }
 </script>
