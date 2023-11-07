@@ -64,37 +64,33 @@ function generateBarcode() {
 
 
 
+    function downloadBarcode(newWidth = 1538, newHeight = 625) {
+        const canvas = document.createElement("canvas");
+        const svg = document.getElementById("barcode");
+        const base64doc = btoa(unescape(encodeURIComponent(svg.outerHTML)));
+        const w = newWidth; //|| parseInt(svg.getAttribute('width'));
+        const h = newHeight; //|| parseInt(svg.getAttribute('height'));
+        const img_to_download = document.createElement('img');
+        img_to_download.src = 'data:image/svg+xml;base64,' + base64doc;
 
-    function downloadBarcode(e, newWidth=1538, newHeight=625) {
-    const canvas = document.createElement("canvas");
-    const svg = document.getElementById("barcode");
-    const base64doc = btoa(unescape(encodeURIComponent(svg.outerHTML)));
-    const w = newWidth //|| parseInt(svg.getAttribute('width'));
-    const h = newHeight //|| parseInt(svg.getAttribute('height'));
-    const img_to_download = document.createElement('img');
-    img_to_download.src = 'data:image/svg+xml;base64,' + base64doc;
-    console.log(w, h);
-    img_to_download.onload = function () {
-        console.log('img loaded');
-        canvas.setAttribute('width', w);
-        canvas.setAttribute('height', h);
-        const context = canvas.getContext("2d");
-        context.drawImage(img_to_download, 0, 0, w, h);
-        const dataURL = canvas.toDataURL('image/png');
-        if (window.navigator.msSaveBlob) {
-            window.navigator.msSaveBlob(canvas.msToBlob(), "barcode.png");
-            e.preventDefault();
-        } else {
-            const a = document.createElement('a');
-            const my_evt = new MouseEvent('click');
-            a.download = 'download.png';
-            a.href = dataURL;
-            a.dispatchEvent(my_evt);
+        img_to_download.onload = function () {
+            canvas.setAttribute('width', w);
+            canvas.setAttribute('height', h);
+            const context = canvas.getContext("2d");
+            context.drawImage(img_to_download, 0, 0, w, h);
+            canvas.toBlob(function (blob) {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'barcode.png';
+                a.click();
+                window.URL.revokeObjectURL(url);
+            });
         }
     }
-}
-function validateInput(input) {
-    console.log(input)
+
+    function validateInput(input) {
+        console.log(input)
         const inputValue = input.value;
         const isValidInput = /^\d{5,}$/.test(inputValue); // Check if the input is a digit and has at least 5 digits
         if (!isValidInput) {
